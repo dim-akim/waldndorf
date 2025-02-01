@@ -1,0 +1,39 @@
+{% extends 'user/waldbase.html' %}
+
+{% block add_style %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', path='css/login.css') }}">
+{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+  <main class="d-flex align-items-center m-auto py-4 bg-body-tertiary">
+    <div class="form-signin w-100 m-auto">
+      <form>
+        <img class="mb-4" src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">
+        <h1 class="h3 mb-3 fw-normal">Авторизация</h1>
+
+        <div class="form-floating">
+          <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+          <label for="floatingInput">E-mail</label>
+        </div>
+        <div class="form-floating">
+          <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+          <label for="floatingPassword">Пароль</label>
+        </div>
+
+        <div class="form-check text-start my-3">
+          <input class="form-check-input" type="checkbox" value="remember-me" id="flexCheckDefault">
+          <label class="form-check-label" for="flexCheckDefault">
+            Запомнить меня
+          </label>
+        </div>
+        <button class="btn btn-primary w-100 py-2" type="submit">Войти</button>
+        <p class="mt-5 mb-3 text-body-secondary">
+          <a href="{{ url_for('get_registration_page') }}">Зарегистрироваться</a>
+        </p>
+      </form>
+    </div>
+  </main>
+{% endblock %}

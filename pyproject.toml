@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "waldndorf"
+version = "0.1.0"
+description = "Wald & Dorf site"
+authors = ["Dmitrii Akimov <akimov@1060.ru>"]
+license = ""
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = {extras = ["all"], version = "^0.115"}
+uvicorn = {extras = ["standart"], version = "^0.34"}
+asyncpg = "^0.30"
+fastapi-users = {extras = ["sqlalchemy"], version = "^14.0.0"}
+python-multipart = "^0.0.20"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

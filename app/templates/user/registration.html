@@ -1,0 +1,124 @@
+{% extends 'user/waldbase.html' %}
+
+{% set placeholders = {
+        'email': 'you@example.com',
+        'username': 'username',
+        'password': '',
+        'password2': '',
+        'name': 'Иван',
+        'surname': 'Иванов',
+        'fathers_name': 'Иванович',
+        'birthday': 'ДД.ММ.ГГГГ',
+        'phone': '',
+        'tg_username': '',
+    }
+%}
+
+{% set prefix = {
+        'birthday': '<svg width="16" height="16" fill="currentColor" class="bi bi-calendar2-plus"><use xlink:href="#calendar"></svg>',
+        'phone': '+7',
+        'tg_username': '@'
+    }
+%}
+
+{% block add_style %}
+  {{ super() }}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/profile.css') }}">
+{% endblock %}
+
+{% block add_script %}
+  {{ super() }}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+  <script src="{{ url_for('static', path='js/profile.js') }}"></script>
+{% endblock %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+  <main class="bg-body-tertiary">
+    <div class="container">
+      <div class="pt-5 text-center">
+        <img class="d-block mx-auto mb-4" src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">
+        <h2>Регистрация</h2>
+        <p class="lead">Вам нужно заполнить эти данные, чтобы принимать участие в наших мероприятиях</p>
+      </div>
+
+      <div class="row g-1 reg">
+
+        <form class="needs-validation">
+          {{ form.hidden_tag() }}
+          <h4 class="mb-3 mt-3">Данные авторизации</h4>
+{#          <hr class="my-2">#}
+          <div class="row g-3">
+            {% for field in form if field.name not in ['hidden_tag'] %}
+              {% if field.name in ['email', 'username', 'password', 'password2'] %}
+                <div class="col-sm-6">
+                  {{ field.label(class='form-label') }}
+                  {{ field(class='form-control', placeholder=placeholders[field.name]) }}
+                  {% if field.errors %}
+                    <div class="invalid-feedback">
+                      {% for error in field.errors %}
+                      {{ error }}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <hr class="my-4">
+{#          <h4 class="mb-1 mt-3">ФИО</h4>#}
+
+          <div class="row g-1">
+            {% for field in form if field.name in ['surname', 'name', 'fathers_name',
+                                                   'birthday', 'phone', 'tg_username'] %}
+            <div class="col-sm-4">
+              {{ field.label(class='form-label') }}
+              {% if field.name in ['birthday', 'phone', 'tg_username'] %}
+                <div class="input-group has-validation">
+                  <span class="input-group-text">{{ prefix[field.name] | safe }}</span>
+                  {{ field(class='form-control', placeholder=placeholders[field.name]) }}
+                </div>
+              {% else %}
+                {{ field(class='form-control', placeholder=placeholders[field.name] | safe) }}
+              {% endif %}
+              {% if field.errors %}
+                  <div class="invalid-feedback">
+                    {% for error in field.errors %}
+                    {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+
+          <hr class="my-4">
+          {% for field in ['is_student', 'is_parent'] %}
+            <div class="form-check">
+              {{ form[field](class='form-check-input', placeholder=placeholders[field.name]) }}
+              {{ form[field].label(class='form-check-label') }}
+{#              <input type="checkbox" class="form-check-input" id="same-address">#}
+{#              <label class="form-check-label" for="same-address">Я - школьник</label>#}
+            </div>
+
+{#            <div class="form-check">#}
+{#              <input type="checkbox" class="form-check-input" id="save-info">#}
+{#              <label class="form-check-label" for="save-info">Я - родитель</label>#}
+{#            </div>#}
+          {% endfor %}
+{#          <hr class="my-4">#}
+            {{ form['submit'](class='mt-3 w-100 btn btn-primary btn-lg')}}
+{#            <button class="w-100 btn btn-primary btn-lg" type="submit">Зарегистрироваться</button>#}
+        </form>
+      </div>
+    </div>
+  </main>
+{% endblock %}
+
