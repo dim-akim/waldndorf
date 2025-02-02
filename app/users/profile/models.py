@@ -1,42 +1,51 @@
-from datetime import datetime
-from typing import Optional
+from datetime import datetime, date
 
-from sqlalchemy import String, TIMESTAMP, ForeignKey, JSON, DATE, Boolean, Table, Column
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlmodel import SQLModel, Field, Relationship, String, Column, JSON
+from sqlalchemy.dialects import postgresql
 
-from app.db import Base, EntityBase
-
-
-association_table = Table(
-    "association_table",
-    Base.metadata,
-    Column("parent_id", ForeignKey("profiles.id"), primary_key=True),
-    Column("child_id", ForeignKey("profiles.id"), primary_key=True),
-)
+from app.db import Base
 
 
-class Role(Base):
+class ParentsChildrenLink(SQLModel, table=True):
+    __tablename__ = "parents_children_table"
+
+    parent_id: int | None = Field(default=None, foreign_key="profiles.id", primary_key=True)
+    child_id: int | None = Field(default=None, foreign_key="profiles.id", primary_key=True)
+
+
+class Role(SQLModel, table=True):
     __tablename__ = "roles"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(nullable=False)
-    permissions: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    id: int = Field(primary_key=True)
+    name: str = Field(index=True)
+    permissions: list[str] = Field(sa_column=Column(JSON))
 
 
 # TODO сделать дополнительные таблицы для школьников и родителей
-class Profile(EntityBase):
+class Profile(Base, table=True):
     __tablename__ = "profiles"
+    
+    id: int | None = Field(default=None, primary_key=True)
+    role_id: int = Field(default=None, foreign_key="roles.id")
+    name: str
+    family_name: str
+    fathers_name: str
+    birthday: date
+    phone_number: str | None = Field(default=None, unique=True)
+    tg_username: str | None = Field(default=None, unique=True)
+    document_type: str | None
+    document_number: str | None
+    document_expiry: date | None
+    children: list["Profile"] = Relationship(back_populates='parents', link_model=ParentsChildrenLink)
+    parents: list["Profile"] = Relationship(back_populates='children', link_model=ParentsChildrenLink)
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    role_id: Mapped[int] = mapped_column(ForeignKey(Role.id))
-    name: Mapped[str]
-    family_name: Mapped[str]
-    fathers_name: Mapped[str]
-    birthday: Mapped[datetime.date] = mapped_column(DATE)
-    phone_number: Mapped[str] = mapped_column(unique=True)
-    tg_username: Mapped[str] = mapped_column(unique=True)
-    document_type: Mapped[Optional[str]]
-    document_number: Mapped[Optional[str]]
-    document_expiry: Mapped[Optional[datetime.date]] = mapped_column(DATE)
-    children: Mapped[list["Profile"]] = relationship(secondary=association_table, back_populates='parents')
-    parents: Mapped[list["Profile"]] = relationship(secondary=association_table, back_populates='children')
+
+class ProfileIn(SQLModel):
+    name: str
+    phone: str
+    kids: int
+
+
+class ProfileOut(SQLModel):
+    name: str
+    phone: str

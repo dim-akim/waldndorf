@@ -3,6 +3,7 @@ from datetime import date
 from fastapi import APIRouter, Depends
 
 from app.users.profile.dao import ProfileDAO
+from app.users.profile.models import ProfileIn, ProfileOut
 
 
 router = APIRouter(
@@ -25,3 +26,9 @@ async def update_profile(profile_id: int):
 @router.delete('/{profile_id}')
 async def delete_profile(profile_id: int):
     pass
+
+
+@router.post('/test', response_model=ProfileOut)
+async def get_test_profile(profile: ProfileIn):
+    result = ProfileOut.model_validate(profile)
+    return result
