@@ -1,12 +1,9 @@
 import enum
-from datetime import datetime
+from datetime import datetime, date
 
-from sqlalchemy import String, TIMESTAMP, ForeignKey, JSON, DATE, Boolean, Enum
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlmodel import SQLModel, Field, Enum, Column
 
-from app.db import EntityBase
-from app.users.auth.models import User
-from app.users.profile.models import Profile
+from app.db import Base
 
 
 class ApplicationStatus(enum.Enum):
@@ -26,32 +23,30 @@ class PaymentStatus(enum.Enum):
     REFUNDED = 'refunded'
 
 
-class Event(EntityBase):
-    __tablename__ = "events"
+class Event(Base, table=True):
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(nullable=False, unique=True, index=True)
-    description: Mapped[str] = mapped_column(nullable=False)
-    short_description: Mapped[str] = mapped_column(nullable=False)
-    start_date: Mapped[datetime.date] = mapped_column(DATE)
-    end_date: Mapped[datetime.date] = mapped_column(DATE)
-    image_id: Mapped[int]
+    id: int = Field(primary_key=True)
+    name: str = Field(unique=True, index=True)
+    description: str
+    short_description: str
+    start_date: date
+    end_date: date
+    image_id: int
 
 
 # TODO сделать дополнительные таблицы для школьников и родителей
-class Application(EntityBase):
-    __tablename__ = "applications"
+class Application(Base, table=True):
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    profile_id: Mapped[int] = mapped_column(ForeignKey(Profile.id))
-    event_id: Mapped[int] = mapped_column(ForeignKey(Event.id))
-    parent_id: Mapped[int] = mapped_column(ForeignKey(User.id), nullable=True)
-    school: Mapped[str]
-    school_class: Mapped[str]
-    have_medicine_issues: Mapped[bool]
-    have_dietary_restrictions: Mapped[bool]
-    medicine_issues: Mapped[str]
-    dietary_restrictions: Mapped[str]
-    sent_at: Mapped[datetime] = mapped_column(TIMESTAMP)
-    status: Mapped[str] = mapped_column(Enum(ApplicationStatus), default=ApplicationStatus.DRAFT)
-    payment_status: Mapped[str] = mapped_column(Enum(PaymentStatus), default=PaymentStatus.NOT_PAID)
+    id: int = Field(primary_key=True)
+    profile_id: int = Field(foreign_key='profiles.id')
+    event_id: int = Field(foreign_key='events.id')
+    parent_id: int | None = Field(default=None, foreign_key='users.id')
+    school: str
+    school_class: str
+    have_medicine_issues: bool
+    have_dietary_restrictions: bool
+    medicine_issues: str
+    dietary_restrictions: str
+    sent_at: datetime
+    status: str = Field(default=ApplicationStatus.DRAFT, sa_column=Column(Enum(ApplicationStatus)))
+    payment_status: str = Field(default=PaymentStatus.NOT_PAID, sa_column=Column(Enum(PaymentStatus)))

@@ -6,7 +6,6 @@ from app.db import Base
 
 
 class User(Base, table=True):
-    __tablename__ = "users"
 
     id: int = Field(primary_key=True)
     username: str = Field(index=True)

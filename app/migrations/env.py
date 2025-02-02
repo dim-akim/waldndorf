@@ -9,7 +9,7 @@ from alembic import context
 from app.config import settings
 import app.users.profile.models
 import app.users.auth.models
-# import app.events.models
+import app.events.models
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
